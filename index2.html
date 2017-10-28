@@ -1,0 +1,105 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Page Template</title>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+    </head>
+    <body>
+        <svg width="500" height="500">
+        </svg>
+        <button onClick="eventoClique()">Clique</button>
+    
+        <script type="text/javascript">
+        var data = []
+        var pontos = 5
+        for (var i = 0;i<pontos;i++){
+            data.push([0, 0, Math.ceil(Math.random() * 10)])
+        }
+        var svg = d3.select("svg").append("g").attr("transform", "translate(10,10)")
+        var xscale = d3.scaleLinear().domain([0, 5000]).range([0,340])
+        var yscale = d3.scaleLinear().domain([0, 5000]).range([480,0])
+        var cscale = d3.scaleLinear().domain([0,50, 100]).range(["red","white", "blue"])
+        var tscale = d3.scaleTime().domain([new Date(2000,0,1), new Date(2000,0,2)]).range([0,960])
+        var qtscale = d3.scaleQuantize().domain([0,5,10,25]).range([0,2,5])
+        var oscale = d3.scaleOrdinal().domain(["B", "E", "A"]).range(["yellow", "red", "blue"]).unknown("black")
+        var bscale = d3.scaleBand().domain([5, 10, 15, 20]).range([0,400])
+        function eventoClique(){
+            // var pontos = Math.ceil(Math.random()*50)
+            // console.log(data);
+            data.forEach(d => {
+                d[0] = Math.random() * 5000
+                d[1] = Math.random() * 5000
+                d[2] = Math.random() * 100
+            })
+            var circle = svg.selectAll("circle").data(data);
+            circle.exit().remove();
+            circle.enter().append("circle").merge(circle)
+            .transition()
+            .duration(1000)
+            // .delay((d, i) => i*100)
+            .attr("cx", d=> xscale(d[0]))
+            .attr("cy", d=> yscale(d[1]))
+            .attr("r", 8)
+            .attr("fill", d=> cscale(d[2]))
+            var text = svg.selectAll("text").data(data)
+            text.exit().remove();
+            text.enter().append("text").merge(text)
+            .transition()
+            .duration(1000)
+            // .delay((d, i) => i*100)
+            .attr("x", d=> xscale(d[0]))
+            .attr("y", d=> yscale(d[1]))
+            .text(d => "(" + d[0].toFixed(2) + ", " + d[1].toFixed(2) + ")")
+            .attr("fill", "red")
+            .attr("font-size", 15)
+        console.log("clicou", pontos);
+        }
+    
+        
+        // var dataset = [[5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
+        // [410, 12], [475, 44], [25, 67], [85, 21], [220, 88]];
+    
+        // d3.select("svg").selectAll("circle").data(dataset).enter().append("circle")
+        // .attr("cx",d=>d[0]).attr("cy",d=>d[1]).attr("r",5);
+    
+        // d3.select("svg").selectAll("text").data(dataset).enter().append("text")
+        // .attr("x",d=>d[0]).attr("y",d=>d[1]).text(d=>d).attr("fill","red");
+        
+        var dataset = []
+        for (var i = 0;i<5;i++){
+            dataset.push(Math.ceil(Math.random()*100))
+        }
+        console.log(dataset)
+
+        var alturascale = d3.scaleLinear().domain([0, Math.min(d3.extent(dataset)[1] + 5)]).range([0,450])
+        var alturascale2 = d3.scaleLinear().domain([0, Math.min(100, d3.extent(dataset)[1] + 5)]).range([450,0])
+
+        var histscale = d3.scaleBand().domain(dataset).range([0,400])
+        histscale.paddingInner([0.1])
+        histscale.paddingOuter([0.1])
+
+        var svg = d3.select("svg").append("g").attr("transform", "translate(0,500) scale(1, -1)")
+        var hist = svg.selectAll("rect").data(dataset)
+        hist.enter().append("rect")
+        .attr("x", d => histscale(d))
+        .attr("y", 20)
+        .attr("width", histscale.bandwidth())
+        .attr("height", d => alturascale(d))
+
+        var oscalet = d3.scaleOrdinal().domain(dataset).range(["yellow", "red", "blue", "black", "white"]).unknown("black")
+        var axis = d3.axisBottom(histscale)
+        d3.select("svg").append("g").attr("transform", "translate(0,480)").call(axis)
+        var axis = d3.axisRight(alturascale2)
+        d3.select("svg").append("g").attr("transform", "translate(400,0) translate(0,30)").call(axis)
+
+
+        // var axis = d3.axisBottom(oscalet)
+        // d3.select("svg").append("g").call(axis)
+        d3.csv("aids.csv", data => {
+            
+            console.log(data)
+        })
+        </script>
+    </body>
+    
+    </html>

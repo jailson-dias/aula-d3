@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"> -->
+    <title>AIDS</title>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+<body>
+    <svg width="500" height="500" style="fill:rgba(80, 56, 168, 0.863)">
+    </svg>
+
+    <script>
+     d3.csv("aids.csv", data => {
+        console.log(data)
+        var dataset = data.map(a => [parseFloat(a[1990].replace(",",".")), parseFloat(a[1991].replace(",",".")), a["UF"]])
+        // dataset.pop()
+        var x = d3.extent(dataset, d => d[0])
+        var y = d3.extent(dataset, d => d[1])
+        var xscale = d3.scaleLinear().domain(x).range([0,400])
+        var yscale = d3.scaleLinear().domain(y).range([450,0])
+
+        var svg = d3.select("svg").append("g").attr("transform", "translate(20,0)")
+        var circle = svg.selectAll("circle").data(dataset);
+        circle.exit().remove();
+        circle.enter().append("circle").merge(circle)
+        .transition()
+        .duration(1000)
+        // .delay((d, i) => i*100)
+        .attr("cx", d=> xscale(d[0]))
+        .attr("cy", d=> yscale(d[1]))
+        .attr("r", 8)
+        var text = svg.selectAll("text").data(dataset)
+        text.exit().remove();
+        text.enter().append("text").merge(text)
+        .transition()
+        .duration(1000)
+        // .delay((d, i) => i*100)
+        .attr("x", d=> xscale(d[0]))
+        .attr("y", d=> yscale(d[1]))
+        .text(d => d[2])
+        .attr("fill", "red")
+        .attr("font-size", 15)
+
+        var axis = d3.axisBottom(xscale)
+        svg.append("g").attr("transform", "translate(0,480)").call(axis)
+        var axis = d3.axisLeft(yscale)
+        svg.append("g").attr("transform", "translate(0,30)").call(axis)
+
+        var zoom = d3.zoom().on("zoom", () => {
+            svg.attr("transform", d3.event.transform);
+            d3.event.transform.rescaleX(xscale);
+            d3.event.transform.rescaleY(yscale);
+        });
+        d3.select("svg").append("rect")
+        .attr("width", xscale(x[1]))
+        .attr("height", yscale(y[0]))
+        .style("fill", "none")
+        .style("pointer-events", "all")
+        .call(zoom);
+        console.log(dataset.map(a => a[2]))
+    })
+
+
+    </script>
+</body>
+</html>
