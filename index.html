@@ -30,18 +30,19 @@
         // .delay((d, i) => i*100)
         .attr("cx", d=> xscale(d[0]))
         .attr("cy", d=> yscale(d[1]))
-        .attr("r", 8)
-        var text = svg.selectAll("text").data(dataset)
-        text.exit().remove();
-        text.enter().append("text").merge(text)
-        .transition()
-        .duration(1000)
-        // .delay((d, i) => i*100)
-        .attr("x", d=> xscale(d[0]))
-        .attr("y", d=> yscale(d[1]))
-        .text(d => d[2])
-        .attr("fill", "red")
-        .attr("font-size", 15)
+        .attr("r", 2)
+        .attr("fill", "black")
+        // var text = svg.selectAll("text").data(dataset)
+        // text.exit().remove();
+        // text.enter().append("text").merge(text)
+        // .transition()
+        // .duration(1000)
+        // // .delay((d, i) => i*100)
+        // .attr("x", d=> xscale(d[0]))
+        // .attr("y", d=> yscale(d[1]))
+        // .text(d => d[2])
+        // .attr("fill", "red")
+        // .attr("font-size", 15)
 
         var axis = d3.axisBottom(xscale)
         svg.append("g").attr("transform", "translate(0,480)").call(axis)
@@ -59,7 +60,52 @@
         .style("fill", "none")
         .style("pointer-events", "all")
         .call(zoom);
-        console.log(dataset.map(a => a[2]))
+
+        var myBrush = d3.brush();
+        var brushGroup = d3.select("svg").append("g").attr("class","brush");
+        myBrush(brushGroup);
+        myBrush.on("start",function(){
+        }) //limpa a seleção
+        myBrush.on("brush",function(){
+            // console.log("brush", d3.event.selection)
+            var selection = d3.event.selection
+            // console.log("selection", selection[0])
+            var into = function(x,y) {
+                if (selection[0][0] <= x && selection[1][0] >= x
+                    && selection[0][1] <= y && selection[1][1] >= y) {
+                        return true
+                    }
+                return false
+            }
+            d3.selectAll("circle")
+            .attr("fill", (d) => {
+                if (into(xscale(d[0]) + 20,yscale(d[1]))) {
+                    // var text = svg.selectAll("text").data(dataset)
+                    // text.exit().remove();
+                    // text.enter().append("text").merge(text)
+                    // .transition()
+                    // .duration(1000)
+                    // // .delay((d, i) => i*100)
+                    // .attr("x", d=> xscale(d[0]))
+                    // .attr("y", d=> yscale(d[1]))
+                    // .text(d => d[2])
+                    // .attr("fill", "red")
+                    // .attr("font-size", 15)
+                    return "blue"
+                }
+                return "black"
+            })
+            .attr("r", (d) => {
+                if (into(xscale(d[0]) + 20,yscale(d[1]))) {
+                    return 10
+                }
+                return 2
+            })
+        }) //atualiza a seleção
+        myBrush.on("end",function(){
+            console.log("end", d3.event.selection)
+        }) //termina o brush
+        // console.log(dataset.map(a => a[2]))
     })
 
 

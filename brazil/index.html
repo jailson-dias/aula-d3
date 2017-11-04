@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BRAZIL AIDS</title>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+</head>
+<body>
+    <svg width="800", height="500"></svg>
+    <div id="slidecontainer">
+        <input type="range" min="1990" max="2009" value="1990" step="1" oninput="slide(this.value)" onchange="slide(this.value)" id="slide">
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>

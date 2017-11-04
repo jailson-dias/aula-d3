@@ -52,6 +52,45 @@
             .text(d => "(" + d[0].toFixed(2) + ", " + d[1].toFixed(2) + ")")
             .attr("fill", "red")
             .attr("font-size", 15)
+
+            var select = svg.selectAll("circle")
+            .on("mouseover", function() {
+                console.log("over")
+                d3.select(this).attr("fill", "orange")
+            })
+            .on("mouseout", function() {
+                console.log("out")
+                d3.select(this).attr("fill", d => cscale(d[2]))
+            })
+
+            var myBrush = d3.brush();
+            var brushGroup = svg.append("g").attr("class","brush");
+            myBrush(brushGroup);
+            myBrush.on("start",function(){
+                console.log("start", d3.event.target.value)
+            }) //limpa a seleção
+            myBrush.on("brush",function(){
+                // console.log("brush", d3.event.selection)
+                var selection = d3.event.selection
+                // console.log("selection", selection[0])
+                var into = function(x,y) {
+                    if (selection[0][0] <= x && selection[1][0] >= x
+                        && selection[0][1] <= y && selection[1][1] >= y) {
+                            return true
+                        }
+                    return false
+                }
+                d3.selectAll("circle")
+                .attr("fill", (d) => {
+                    if (into(xscale(d[0]),yscale(d[1]))) {
+                        return "red"
+                    }
+                    return cscale(d[2])
+                })
+            }) //atualiza a seleção
+            myBrush.on("end",function(){
+                console.log("end", d3.event.selection)
+            }) //termina o brush
         console.log("clicou", pontos);
         }
     
@@ -78,13 +117,14 @@
         histscale.paddingInner([0.1])
         histscale.paddingOuter([0.1])
 
-        var svg = d3.select("svg").append("g").attr("transform", "translate(0,500) scale(1, -1)")
-        var hist = svg.selectAll("rect").data(dataset)
-        hist.enter().append("rect")
-        .attr("x", d => histscale(d))
-        .attr("y", 20)
-        .attr("width", histscale.bandwidth())
-        .attr("height", d => alturascale(d))
+        // var svg = d3.select("svg").append("g")
+        // .attr("transform", "translate(0,500) scale(1, -1)")
+        // var hist = svg.selectAll("rect").data(dataset)
+        // hist.enter().append("rect")
+        // .attr("x", d => histscale(d))
+        // .attr("y", 20)
+        // .attr("width", histscale.bandwidth())
+        // .attr("height", d => alturascale(d))
 
         var oscalet = d3.scaleOrdinal().domain(dataset).range(["yellow", "red", "blue", "black", "white"]).unknown("black")
         var axis = d3.axisBottom(histscale)
@@ -93,8 +133,8 @@
         d3.select("svg").append("g").attr("transform", "translate(400,0) translate(0,30)").call(axis)
 
 
-        // var axis = d3.axisBottom(oscalet)
-        // d3.select("svg").append("g").call(axis)
+        var axis = d3.axisBottom(oscalet)
+        d3.select("svg").append("g").call(axis)
         d3.csv("aids.csv", data => {
             
             console.log(data)
